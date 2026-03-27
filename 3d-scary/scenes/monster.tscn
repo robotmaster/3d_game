@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://dajvylmeck7sc"]
+
+[ext_resource type="Script" uid="uid://cbpxfijnfuuw2" path="res://scripts/monster.gd" id="1_uwnm8"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_uwnm8"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_0035k"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0035k"]
+albedo_color = Color(0.95891804, 0, 0.20356676, 1)
+
+[node name="Monster" type="RigidBody3D"]
+axis_lock_angular_x = true
+axis_lock_angular_z = true
+script = ExtResource("1_uwnm8")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_uwnm8")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CapsuleMesh_0035k")
+surface_material_override/0 = SubResource("StandardMaterial3D_0035k")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

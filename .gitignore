@@ -1,0 +1,12 @@
+# Godot 4 cache
+.godot/
+
+# Import cache
+.import/
+
+# Optional (export configs / local paths)
+export_presets.cfg
+
+# OS junk
+.DS_Store
+Thumbs.db

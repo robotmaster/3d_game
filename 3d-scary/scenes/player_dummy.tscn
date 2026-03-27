@@ -1,0 +1,44 @@
+[gd_scene load_steps=7 format=3 uid="uid://scpeciene0he"]
+
+[ext_resource type="Script" uid="uid://d1quek0sqsjb1" path="res://scripts/player_dummy.gd" id="1_gd6hj"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u8vuu"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_3f56l"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gd6hj"]
+albedo_color = Color(2.8878452e-07, 0.4483121, 0.4284598, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_8woje"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v5a1s"]
+albedo_color = Color(0, 0, 0, 1)
+
+[node name="PlayerDummy" type="RigidBody3D"]
+mass = 23.385
+script = ExtResource("1_gd6hj")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0227733, 0)
+shape = SubResource("CapsuleShape3D_u8vuu")
+
+[node name="PlayerModel" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6493316, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlayerModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6265583, 0)
+mesh = SubResource("CapsuleMesh_3f56l")
+skeleton = NodePath("../../PlayerCollision")
+surface_material_override/0 = SubResource("StandardMaterial3D_gd6hj")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="PlayerModel"]
+transform = Transform3D(0.21393485, 0, 0, 0, 0.28051832, 0, 0, 0, 0.53128946, 0.18, -0.20833158, -0.314)
+mesh = SubResource("BoxMesh_8woje")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_v5a1s")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="PlayerModel"]
+transform = Transform3D(0.21393485, 0, 0, 0, 0.28051832, 0, 0, 0, 0.53128946, -0.18, -0.20833158, -0.314)
+mesh = SubResource("BoxMesh_8woje")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_v5a1s")
