@@ -167,7 +167,7 @@ func handle_wall_highlight():
 	if wall_info == null:
 		highlight_line.position = Vector3(0, -100000, 0)
 		return
-	highlight_line.position = wall_info.position + Vector3(0, 0.01, 0)
+	highlight_line.position = wall_info.position + Vector3(0, 0.015, 0)
 	if !wall_info.direction.x != 0:
 		highlight_line.global_rotation = Vector3(0, PI/2, 0)
 	else:

@@ -69,5 +69,14 @@ theme_override_styles/background = SubResource("StyleBoxFlat_sugp2")
 theme_override_styles/fill = SubResource("StyleBoxFlat_jyhfs")
 show_percentage = false
 
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI"]
+visible = false
+layout_mode = 0
+offset_left = 960.0
+offset_top = 540.0
+offset_right = 970.0
+offset_bottom = 550.0
+color = Color(0.13501206, 0.13501206, 0.13501206, 1)
+
 [node name="Skybox" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_0wfyh")
