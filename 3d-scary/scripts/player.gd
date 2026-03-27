@@ -294,17 +294,16 @@ func handle_death():
 	
 	
 	var camera = $CameraPivot
-	var move_direction = Vector2.UP.rotated(camera.global_rotation.y) * 3
+	var move_direction = Vector2.UP.rotated(camera.global_rotation.y) * 1.5
 	
 	remove_child(camera)
 	get_tree().current_scene.add_child(camera)
 	
 	
-	var move_up_amount = 6
+	var move_up_amount = 5
 	
-	camera.global_position = global_position + Vector3(move_direction.x, move_up_amount, move_direction.y)
+	camera.global_position = global_position + Vector3(-move_direction.x, move_up_amount, move_direction.y)
 	camera.look_at(global_position, Vector3.UP)
-	
 	
 	var dummy = PLAYER_DEATH_SCENE.instantiate()
 	get_tree().current_scene.add_child(dummy)
