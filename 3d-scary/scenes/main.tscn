@@ -57,14 +57,16 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+mouse_filter = 2
 script = ExtResource("4_jyhfs")
 
 [node name="StaminaBar" type="ProgressBar" parent="CanvasLayer/UI"]
 layout_mode = 0
-offset_left = 453.0
+offset_left = 480.0
 offset_top = 48.0
-offset_right = 1413.0
+offset_right = 1440.0
 offset_bottom = 75.0
+mouse_filter = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_sugp2")
 theme_override_styles/fill = SubResource("StyleBoxFlat_jyhfs")
 show_percentage = false
@@ -72,11 +74,12 @@ show_percentage = false
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI"]
 visible = false
 layout_mode = 0
-offset_left = 960.0
-offset_top = 540.0
+offset_left = 950.0
+offset_top = 530.0
 offset_right = 970.0
 offset_bottom = 550.0
-color = Color(0.13501206, 0.13501206, 0.13501206, 1)
+mouse_filter = 2
+color = Color(0.2123048, 0.21230483, 0.21230477, 0.2901961)
 
 [node name="Skybox" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_0wfyh")

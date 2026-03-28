@@ -1,4 +1,5 @@
 extends Node
+class_name GlobalType
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED

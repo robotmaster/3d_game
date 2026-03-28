@@ -13,6 +13,8 @@ class_name PlayerType
 @export var MONSTER_COUNT := 1
 
 @onready var Floor : FloorType = get_node("/root/Main/Floor")
+@onready var Global : GlobalType = get_node("/root/Global")
+@onready var UI : UIType = get_node("/root/Main/CanvasLayer/UI")
 
 const PLAYER_DEATH_SCENE = preload("res://scenes/player_dummy.tscn")
 const WALL_SCENE = preload("res://scenes/placeable_wall.tscn")
@@ -40,6 +42,7 @@ func cell_to_world(cell_pos):
 
 
 func _ready():
+	UI.draw_crosshair = true
 	for i in range(MONSTER_COUNT):
 		var monster = MONSTER_SCENE.instantiate()
 		get_tree().current_scene.add_child.call_deferred(monster)
@@ -90,7 +93,7 @@ func place_boundary_walls():
 		handle_wall_placement({"tile_pos": Vector2i(i, Floor.GRID_SIZE - 1), "direction": Vector2(0, 1), "position": Vector3(x_pos, 0, -z_pos), "type": "set"})
 
 func _unhandled_input(event):
-	if event is InputEventMouseMotion:
+	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		camera_pitch -= event.relative.y * mouse_sensitivity
 		camera_pitch = clamp(camera_pitch, deg_to_rad(-80), deg_to_rad(80))
@@ -292,6 +295,7 @@ func handle_death():
 		return
 	dead = true
 	
+	UI.draw_crosshair = false
 	
 	var camera = $CameraPivot
 	var move_direction = Vector2.UP.rotated(camera.global_rotation.y) * 1.5

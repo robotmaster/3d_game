@@ -10,5 +10,5 @@ func _ready() -> void:
 	$WallCollision.shape.size = $WallMesh.mesh.size
 	
 	$WallMesh.global_position.y = -$WallMesh.mesh.size.y / 2
-	var new_tween = get_tree().create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	var new_tween = get_tree().create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	new_tween.tween_property($WallMesh, "global_position:y", 0, WALL_RISE_TIME)
