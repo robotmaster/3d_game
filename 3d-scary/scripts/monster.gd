@@ -6,7 +6,7 @@ class_name MonsterType
 @onready var Floor : FloorType = get_node("/root/Main/Floor")
 
 @export var max_speed = 7.0
-@export var ACCELERATION_MULT = 0.08
+@export var ACCELERATION_MULT = 0.08 
 
 var current_path = null
 func _ready() -> void:
@@ -24,7 +24,7 @@ func _physics_process(delta: float) -> void:
 		#var placeholder = load("res://scenes/placeholder.tscn").instantiate()
 		#placeholder.global_position = Vector3(cell_to_world(i.position_x), 0, cell_to_world(i.position_y))
 		#get_tree().current_scene.add_child(placeholder)
-	if current_path == null or (world_to_cell(global_position.x) == current_path[1].position_x and world_to_cell(global_position.z) == current_path[1].position_y):
+	if current_path == null or (world_to_cell(global_position.x) != current_path[0].position_x or world_to_cell(global_position.z) != current_path[0].position_y):
 		current_path = pathfind_to_player()
 	var target = Vector2(Player.global_position.x, Player.global_position.z)
 	if len(current_path) >= 2:
