@@ -2,19 +2,19 @@ extends CharacterBody3D
 class_name PlayerType
 
 @export var SPEED := 4.7
-@export var SPRINT_SPEED_MULT := 1.9
+@export var SPRINT_SPEED_MULT := 2.05
+@export var SIDEWAYS_SPRINT_NERF = 0.4
 @export var STAMINA_TIME = 2
 @export var STAMINA_REGEN_TIME = 4.5
 @export var JUMP_VELOCITY := 4.5
 @export var CAMERA_SEE_LENGTH = 10
-
-@export var mouse_sensitivity = 0.003
 
 @export var MONSTER_COUNT := 1
 
 @onready var Floor : FloorType = get_node("/root/Main/Floor")
 @onready var Global : GlobalType = get_node("/root/Global")
 @onready var UI : UIType = get_node("/root/Main/CanvasLayer/UI")
+@onready var Jumpscare = get_node("/root/Main/CanvasLayer/Jumpscare")
 
 const PLAYER_DEATH_SCENE = preload("res://scenes/player_dummy.tscn")
 const WALL_SCENE = preload("res://scenes/placeable_wall.tscn")
@@ -34,23 +34,32 @@ var highlight_line : MeshInstance3D = null
 var wall_layout = []
 
 var monsters = []
-
-#func world_to_cell(world_pos):
-	#return floor(world_pos / Floor.TILE_SIZE) + floor((Floor.GRID_SIZE / 2))
 func cell_to_world(cell_pos):
 	return cell_pos * Floor.TILE_SIZE - (Floor.GRID_SIZE / 2) * Floor.TILE_SIZE
 
 
 func _ready():
 	UI.draw_crosshair = true
+	setup_monsters()
+	global_position = Vector3(0, 0, cell_to_world(Floor.GRID_SIZE / 2 + 5))
+	initialize_wall_placement_highlight()
+	init_wall_grid_tracking()
+	place_boundary_walls()
+
+func setup_monsters():
 	for i in range(MONSTER_COUNT):
 		var monster = MONSTER_SCENE.instantiate()
 		get_tree().current_scene.add_child.call_deferred(monster)
 		monsters.append(monster)
-	global_position = Vector3(cell_to_world(Floor.GRID_SIZE / 2), 0, cell_to_world(Floor.GRID_SIZE / 2 + 5))
-	initialize_wall_placement_highlight()
-	init_wall_grid_tracking()
-	place_boundary_walls()
+	for monster in monsters:
+		#setup "other monsters" array
+		var other_monsters = []
+		for other_monster in monsters:
+			if other_monster == monster:
+				continue
+			other_monsters.append(other_monster)
+		monster.other_monsters = other_monsters
+
 
 func init_wall_grid_tracking():
 	var info = {"positive_x": false, "negative_x": false, "positive_z": false, "negative_z": false}
@@ -92,40 +101,12 @@ func place_boundary_walls():
 		handle_wall_placement({"tile_pos": Vector2i(i, 0), "direction": Vector2(0, -1), "position": Vector3(x_pos, 0, z_pos), "type": "set"})
 		handle_wall_placement({"tile_pos": Vector2i(i, Floor.GRID_SIZE - 1), "direction": Vector2(0, 1), "position": Vector3(x_pos, 0, -z_pos), "type": "set"})
 
-func _unhandled_input(event):
-	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		rotate_y(-event.relative.x * mouse_sensitivity)
-		camera_pitch -= event.relative.y * mouse_sensitivity
-		camera_pitch = clamp(camera_pitch, deg_to_rad(-80), deg_to_rad(80))
-		$CameraPivot.rotation.x = camera_pitch
 
-func handle_mouse_click(event):
-	
-	var wall_info = get_closest_grid_edge(raycast_from_camera())
-	if wall_info == null:
-		return
-	
-	#var cell_wall_info = wall_layout[wall_info.tile_pos.x][wall_info.tile_pos.y]
-	#if wall_info.direction.x != 0:
-		#if wall_info.direction.x > 0 and cell_wall_info.positive_x:
-			#return
-		#elif wall_info.direction.x < 0 and cell_wall_info.negative_x:
-			#return
-	#else:
-		#if wall_info.direction.y > 0 and cell_wall_info.positive_z:
-			#return
-		#elif wall_info.direction.y < 0 and cell_wall_info.negative_z:
-			#return
-	if update_wall_layout(wall_info):
-		var valid = true
-		for i in range(MONSTER_COUNT):
-			if monsters[i].pathfind_to_player() == null:
-				valid = false
-		delete_wall_layout(wall_info)
-		if valid:
-			handle_wall_placement(wall_info)
-			for i in range(MONSTER_COUNT):
-				monsters[i].current_path = monsters[i].pathfind_to_player()
+func turn_player(mouse_motion):
+	rotate_y(-mouse_motion.x)
+	camera_pitch -= mouse_motion.y
+	camera_pitch = clamp(camera_pitch, deg_to_rad(-80), deg_to_rad(80))
+	$CameraPivot.rotation.x = camera_pitch
 
 func _physics_process(delta: float) -> void:
 	handle_movement(delta)
@@ -134,6 +115,12 @@ func _process(delta: float) -> void:
 	handle_wall_highlight()
 
 func handle_movement(delta):
+	#prevent moving into wall the moment it is pressed
+	#var saved_velocity = velocity
+	#velocity = velocity * 0.0000005
+	#move_and_slide()
+	#velocity = saved_velocity
+	
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
@@ -142,15 +129,18 @@ func handle_movement(delta):
 
 	var input_dir := Input.get_vector("left", "right", "forward", "back")
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+
 	if direction and Input.is_action_pressed("sprint") and stamina > 0:
-		velocity.x = direction.x * SPEED * SPRINT_SPEED_MULT
-		velocity.z = direction.z * SPEED * SPRINT_SPEED_MULT
-	elif direction:
+		if input_dir.y < 0:
+			direction += transform.basis * Vector3(input_dir.x * SIDEWAYS_SPRINT_NERF, 0, input_dir.y) * (SPRINT_SPEED_MULT - 1)
+		else:
+			direction += transform.basis * Vector3(input_dir.x * SIDEWAYS_SPRINT_NERF, 0, input_dir.y * SIDEWAYS_SPRINT_NERF) * (SPRINT_SPEED_MULT - 1)
+	if direction:
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
 	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
+		velocity.x *= 0.8
+		velocity.z *= 0.8
 	
 	
 	if Input.is_action_pressed("sprint"):
@@ -164,6 +154,64 @@ func handle_movement(delta):
 	
 	
 	move_and_slide()
+
+
+func handle_death(activate_scare):
+	if dead:
+		return
+	dead = true
+	
+	UI.draw_crosshair = false
+	
+	var camera = $CameraPivot
+	var move_direction = Vector2.UP.rotated(camera.global_rotation.y) * 1.5
+	
+	remove_child(camera)
+	get_tree().current_scene.add_child(camera)
+	
+	
+	var move_up_amount = 5
+	
+	camera.global_position = global_position + Vector3(-move_direction.x, move_up_amount, move_direction.y)
+	camera.look_at(global_position, Vector3.UP)
+	var dummy = PLAYER_DEATH_SCENE.instantiate()
+	get_tree().current_scene.add_child(dummy)
+	dummy.global_transform = global_transform
+	
+	
+	for i in range(MONSTER_COUNT):
+		monsters[i].Player = dummy
+	$PlayerCollision.disabled = true
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
+	
+	if Global.settings.scary and activate_scare:
+		Jumpscare.scare_started = true
+		var audio = AudioStreamPlayer3D.new()
+		get_tree().current_scene.add_child(audio)
+		
+		audio.stream = load("res://scare.mp3")
+		audio.global_position = global_position
+		audio.play()
+
+
+
+
+func handle_mouse_click():
+	
+	var wall_info = get_closest_grid_edge(raycast_from_camera())
+	if wall_info == null:
+		return
+	if update_wall_layout(wall_info):
+		var valid = true
+		for i in range(MONSTER_COUNT):
+			if monsters[i].pathfind_to_player() == null:
+				valid = false
+		delete_wall_layout(wall_info)
+		if valid:
+			handle_wall_placement(wall_info)
+			for i in range(MONSTER_COUNT):
+				monsters[i].current_path = monsters[i].pathfind_to_player()
 
 func handle_wall_highlight():
 	var wall_info = get_closest_grid_edge(raycast_from_camera())
@@ -192,16 +240,16 @@ func handle_wall_placement(position_and_type_info):
 	
 	if position_and_type_info.type == "set":
 		new_wall = BOUNDARY_WALL_SCENE.instantiate()
+		get_tree().current_scene.add_child.call_deferred(new_wall)
 	else:
 		new_wall = WALL_SCENE.instantiate()
-	get_node("/root/Main").add_child.call_deferred(new_wall)
+		get_tree().current_scene.add_child.call_deferred(new_wall)
 	new_wall.global_position = position_and_type_info.position
 	
 	if position_and_type_info.direction.x == 0:
 		new_wall.rotation = Vector3(0, PI/2, 0)
 	
 	update_wall_layout(position_and_type_info)
-	
 	
 func update_wall_layout(position_and_type_info):
 	var tile_x = position_and_type_info.tile_pos.x
@@ -259,6 +307,8 @@ func delete_wall_layout(position_and_type_info):
 			if tile_y != 0:
 				wall_layout[tile_x][tile_y - 1].positive_z = false
 
+
+
 func raycast_from_camera():
 	var camera = $CameraPivot/Camera3D
 
@@ -266,7 +316,7 @@ func raycast_from_camera():
 	var to = from + camera.global_transform.basis.z * -CAMERA_SEE_LENGTH
 
 	var space = get_world_3d().direct_space_state
-	var result = space.intersect_ray(PhysicsRayQueryParameters3D.create(from, to))
+	var result = space.intersect_ray(PhysicsRayQueryParameters3D.create(from, to, 1))
 
 	if result:
 		return result
@@ -289,33 +339,3 @@ func get_closest_grid_edge(raycast_result):
 		direction = Vector3(0, 0, sign(remaining_position.z) * Floor.TILE_SIZE / 2)
 	var tile_looking_at = Vector2i(round(divided_by_tile_size.x) + floor((Floor.GRID_SIZE / 2)), round(divided_by_tile_size.z) + floor((Floor.GRID_SIZE / 2)))
 	return {"tile_pos": tile_looking_at, "direction": Vector2(direction.x, direction.z), "position": tile_pos + direction, "type": "placed"}
-	
-func handle_death():
-	if dead:
-		return
-	dead = true
-	
-	UI.draw_crosshair = false
-	
-	var camera = $CameraPivot
-	var move_direction = Vector2.UP.rotated(camera.global_rotation.y) * 1.5
-	
-	remove_child(camera)
-	get_tree().current_scene.add_child(camera)
-	
-	
-	var move_up_amount = 5
-	
-	camera.global_position = global_position + Vector3(-move_direction.x, move_up_amount, move_direction.y)
-	camera.look_at(global_position, Vector3.UP)
-	
-	var dummy = PLAYER_DEATH_SCENE.instantiate()
-	get_tree().current_scene.add_child(dummy)
-	dummy.global_transform = global_transform
-	
-	
-	for i in range(MONSTER_COUNT):
-		monsters[i].Player = dummy
-	$PlayerCollision.disabled = true
-	visible = false
-	process_mode = Node.PROCESS_MODE_DISABLED

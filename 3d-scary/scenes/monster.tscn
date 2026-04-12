@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://dajvylmeck7sc"]
+[gd_scene load_steps=6 format=3 uid="uid://dajvylmeck7sc"]
 
 [ext_resource type="Script" uid="uid://cbpxfijnfuuw2" path="res://scripts/monster.gd" id="1_uwnm8"]
+[ext_resource type="Texture2D" uid="uid://dmy8ib8gbexcq" path="res://monster_smile.png" id="2_1cbnp"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_uwnm8"]
 
@@ -10,7 +11,10 @@
 albedo_color = Color(0.95891804, 0, 0.20356676, 1)
 
 [node name="Monster" type="RigidBody3D"]
+collision_layer = 2
+collision_mask = 3
 axis_lock_angular_x = true
+axis_lock_angular_y = true
 axis_lock_angular_z = true
 script = ExtResource("1_uwnm8")
 
@@ -18,9 +22,15 @@ script = ExtResource("1_uwnm8")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_uwnm8")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="BeanShape" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("CapsuleMesh_0035k")
 surface_material_override/0 = SubResource("StandardMaterial3D_0035k")
+
+[node name="Mouth" type="Sprite3D" parent="."]
+transform = Transform3D(0.67050916, 0, 0, 0, 0.6863856, 0, 0, 0, 2.7892756, 0, 1.0884947, -0.50485826)
+visible = false
+modulate = Color(0.15487596, 0.154876, 0.1548759, 1)
+texture = ExtResource("2_1cbnp")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

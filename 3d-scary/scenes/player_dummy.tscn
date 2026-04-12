@@ -15,6 +15,8 @@ albedo_color = Color(2.8878452e-07, 0.4483121, 0.4284598, 1)
 albedo_color = Color(0, 0, 0, 1)
 
 [node name="PlayerDummy" type="RigidBody3D"]
+collision_layer = 2
+collision_mask = 3
 mass = 23.385
 script = ExtResource("1_gd6hj")
 

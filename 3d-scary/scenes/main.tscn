@@ -1,8 +1,23 @@
-[gd_scene load_steps=10 format=3 uid="uid://rf7np0rsqv73"]
+[gd_scene load_steps=14 format=3 uid="uid://rf7np0rsqv73"]
 
+[ext_resource type="Script" uid="uid://b8jky8cdj2v2q" path="res://scripts/environment.gd" id="1_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://d2vu722mqafpl" path="res://scenes/player.tscn" id="2_0wfyh"]
-[ext_resource type="Script" uid="uid://78vxtj03c3vk" path="res://scripts/spawn_ground_lines.gd" id="2_sugp2"]
+[ext_resource type="Script" uid="uid://78vxtj03c3vk" path="res://scripts/floor.gd" id="2_sugp2"]
 [ext_resource type="Script" uid="uid://0nk2kv1lue0c" path="res://scripts/ui.gd" id="4_jyhfs"]
+[ext_resource type="Texture2D" uid="uid://dmy8ib8gbexcq" path="res://monster_smile.png" id="5_tbgi4"]
+[ext_resource type="Script" uid="uid://dn1sn86umlqcm" path="res://scripts/jumpscare.gd" id="5_tefeu"]
+
+[sub_resource type="Environment" id="Environment_0wfyh"]
+background_mode = 1
+background_color = Color(0.2, 0.5254902, 0.7490196, 1)
+fog_enabled = true
+fog_light_color = Color(0.3130458, 0.33806843, 0.38393787, 1)
+fog_light_energy = 7.7
+fog_sun_scatter = 0.9
+fog_density = 0.002
+fog_sky_affect = 0.6
+volumetric_fog_density = 0.01
+volumetric_fog_emission = Color(0.4915833, 0.49158323, 0.49158323, 1)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_o5qli"]
 size = Vector2(50000, 50000)
@@ -17,29 +32,27 @@ bg_color = Color(0.78654695, 0.51610595, 0.5212895, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jyhfs"]
 bg_color = Color(0.36819193, 0.63249654, 0.80659604, 1)
 
-[sub_resource type="Environment" id="Environment_0wfyh"]
-background_mode = 1
-background_color = Color(0.2, 0.5254902, 0.7490196, 1)
-fog_enabled = true
-fog_light_color = Color(0.2845838, 0.30822498, 0.35214925, 1)
-fog_light_energy = 7.7
-fog_sun_scatter = 0.9
-fog_density = 0.04
-fog_sky_affect = 0.9
-volumetric_fog_density = 0.01
-volumetric_fog_emission = Color(0.4915833, 0.49158323, 0.49158323, 1)
+[sub_resource type="LabelSettings" id="LabelSettings_sugp2"]
+font_size = 70
 
 [node name="Main" type="Node3D"]
 
-[node name="Lighting" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.9936506, 0.03754537, 0.1060601, -0.11250954, 0.33158946, 0.9366909, 0, -0.94267637, 0.3337083, 0, 0, 0)
-light_energy = 0.258
+[node name="Environment" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 7.450581e-09, 1.0000001, 0, 0, 0, 1.0000001, 0, 0, 0)
+script = ExtResource("1_jyhfs")
+
+[node name="Skybox" type="WorldEnvironment" parent="Environment"]
+environment = SubResource("Environment_0wfyh")
+
+[node name="Lighting" type="DirectionalLight3D" parent="Environment"]
+transform = Transform3D(0.9936507, 0.03754537, 0.106060095, -0.11250954, 0.33158946, 0.93669087, 0, -0.9426763, 0.3337083, 0, 0, 0)
+light_energy = 0.25
 shadow_enabled = true
 
 [node name="Floor" type="StaticBody3D" parent="."]
 script = ExtResource("2_sugp2")
 
-[node name="Floor" type="MeshInstance3D" parent="Floor"]
+[node name="FloorMesh" type="MeshInstance3D" parent="Floor"]
 mesh = SubResource("PlaneMesh_o5qli")
 skeleton = NodePath("")
 surface_material_override/0 = SubResource("StandardMaterial3D_0wfyh")
@@ -63,23 +76,35 @@ script = ExtResource("4_jyhfs")
 [node name="StaminaBar" type="ProgressBar" parent="CanvasLayer/UI"]
 layout_mode = 0
 offset_left = 480.0
-offset_top = 48.0
+offset_top = 127.0
 offset_right = 1440.0
-offset_bottom = 75.0
+offset_bottom = 154.0
 mouse_filter = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_sugp2")
 theme_override_styles/fill = SubResource("StyleBoxFlat_jyhfs")
 show_percentage = false
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI"]
-visible = false
+[node name="SurviveTime" type="Label" parent="CanvasLayer/UI"]
 layout_mode = 0
-offset_left = 950.0
-offset_top = 530.0
-offset_right = 970.0
-offset_bottom = 550.0
-mouse_filter = 2
-color = Color(0.2123048, 0.21230483, 0.21230477, 0.2901961)
+offset_top = 12.0
+offset_right = 1920.0
+offset_bottom = 46.0
+text = "Survived Time: 0"
+label_settings = SubResource("LabelSettings_sugp2")
+horizontal_alignment = 1
 
-[node name="Skybox" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_0wfyh")
+[node name="Jumpscare" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("5_tefeu")
+
+[node name="Background" type="Polygon2D" parent="CanvasLayer/Jumpscare"]
+color = Color(1, 1, 1, 0.809)
+polygon = PackedVector2Array(3033, -484, -358, -753, -385, 1261, 2806, 1376)
+
+[node name="Face" type="Sprite2D" parent="CanvasLayer/Jumpscare"]
+position = Vector2(960, 259.134)
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("5_tbgi4")
