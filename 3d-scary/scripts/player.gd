@@ -123,14 +123,16 @@ func handle_movement(delta):
 	
 	if not is_on_floor():
 		velocity += get_gravity() * delta
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+	if Global.get_input("JUSTjump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
-
-
-	var input_dir := Input.get_vector("left", "right", "forward", "back")
+	
+	var horizontal_input = int(Global.get_input("right")) - int(Global.get_input("left"))
+	var forward_input = int(Global.get_input("back")) - int(Global.get_input("forward"))
+	
+	var input_dir := Vector2(horizontal_input, forward_input).normalized()
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 
-	if direction and Input.is_action_pressed("sprint") and stamina > 0:
+	if direction and Global.get_input("sprint") and stamina > 0:
 		if input_dir.y < 0:
 			direction += transform.basis * Vector3(input_dir.x * SIDEWAYS_SPRINT_NERF, 0, input_dir.y) * (SPRINT_SPEED_MULT - 1)
 		else:
@@ -143,7 +145,7 @@ func handle_movement(delta):
 		velocity.z *= 0.8
 	
 	
-	if Input.is_action_pressed("sprint"):
+	if Global.get_input("sprint"):
 		stamina -= delta
 		if stamina < 0:
 			stamina = 0
