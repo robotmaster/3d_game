@@ -13,7 +13,7 @@ var logs_needed = ["left", "right", "forward", "back", "sprint", "JUSTjump", "JU
 var unhandled_mouse_motion = Vector2()
 var log_file
 
-var playing_back_inputs = true
+var playing_back_inputs = false
 var input_file = "user://game_logs/2026-04-12T21-12-03.txt"
 var inputs_to_play = {}
 
@@ -54,7 +54,7 @@ func handle_mouse_down():
 		
 	var player = get_node("/root/Main/Player")
 	if player.get_node("CameraPivot") != null:
-		player.handle_mouse_click()
+		player.handle_mouse_click.call_deferred()
 
 func new_game():
 	physics_frames_at_last_game = Engine.get_physics_frames()

@@ -197,8 +197,6 @@ func handle_death(activate_scare):
 		audio.play()
 
 
-
-
 func handle_mouse_click():
 	
 	var wall_info = get_closest_grid_edge(raycast_from_camera())
@@ -245,7 +243,7 @@ func handle_wall_placement(position_and_type_info):
 		get_tree().current_scene.add_child.call_deferred(new_wall)
 	else:
 		new_wall = WALL_SCENE.instantiate()
-		get_tree().current_scene.add_child.call_deferred(new_wall)
+		get_tree().current_scene.add_child(new_wall)
 	new_wall.global_position = position_and_type_info.position
 	
 	if position_and_type_info.direction.x == 0:

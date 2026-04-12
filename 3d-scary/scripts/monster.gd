@@ -43,8 +43,8 @@ func _physics_process(delta: float) -> void:
 	
 	var direction = (target - Vector2(global_position.x, global_position.z)).normalized()
 	
-	linear_velocity.x += direction.x * max_speed * ACCELERATION_MULT
-	linear_velocity.z += direction.y * max_speed * ACCELERATION_MULT
+	#linear_velocity.x += direction.x * max_speed * ACCELERATION_MULT
+	#linear_velocity.z += direction.y * max_speed * ACCELERATION_MULT
 	
 	if linear_velocity.length() > max_speed:
 		linear_velocity = linear_velocity.normalized() * max_speed
