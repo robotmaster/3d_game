@@ -19,7 +19,7 @@ var inputs_to_play = {}
 
 
 var settings = {
-	"scary": false
+	"scary": true
 }
 
 func _ready() -> void:

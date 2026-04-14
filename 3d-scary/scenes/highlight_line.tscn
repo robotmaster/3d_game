@@ -1,0 +1,41 @@
+[gd_scene load_steps=7 format=3 uid="uid://c0t2f4oexnrf0"]
+
+[ext_resource type="Script" uid="uid://cg0rodfp8wigl" path="res://scripts/highlight_line.gd" id="1_iifvh"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_xqmw7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xqmw7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iifvh"]
+transparency = 1
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 1, 1, 0.19607843)
+
+[sub_resource type="SphereMesh" id="SphereMesh_a74jw"]
+material = SubResource("StandardMaterial3D_iifvh")
+radius = 0.05
+height = 0.1
+
+[sub_resource type="Gradient" id="Gradient_iifvh"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[node name="HighlightLine" type="Node3D"]
+script = ExtResource("1_iifvh")
+
+[node name="LineMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_xqmw7")
+surface_material_override/0 = SubResource("StandardMaterial3D_xqmw7")
+
+[node name="Particles" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.10777986, 0)
+amount = 100
+lifetime = 0.8
+mesh = SubResource("SphereMesh_a74jw")
+emission_shape = 3
+emission_box_extents = Vector3(1, 0, 1)
+direction = Vector3(0, 1, 0)
+spread = 0.0
+gravity = Vector3(0, 0.5, 0)
+initial_velocity_min = 0.8
+initial_velocity_max = 1.0
+color_ramp = SubResource("Gradient_iifvh")

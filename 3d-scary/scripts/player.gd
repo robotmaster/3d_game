@@ -20,6 +20,7 @@ const PLAYER_DEATH_SCENE = preload("res://scenes/player_dummy.tscn")
 const WALL_SCENE = preload("res://scenes/placeable_wall.tscn")
 const BOUNDARY_WALL_SCENE = preload("res://scenes/set_wall.tscn")
 const MONSTER_SCENE = preload("res://scenes/monster.tscn")
+const HIGHLIGHT_LINE_SCENE = preload("res://scenes/highlight_line.tscn")
 
 var stamina = 0
 
@@ -29,7 +30,7 @@ var time_survived = 0.0
 
 var camera_pitch = 0.0
 
-var highlight_line : MeshInstance3D = null
+var highlight_line = null
 
 var wall_layout = []
 
@@ -79,13 +80,13 @@ func init_wall_grid_tracking():
 		#wall_layout[i][Floor.GRID_SIZE - 1].positive_z = true
 
 func initialize_wall_placement_highlight():
-	highlight_line = MeshInstance3D.new()
-	highlight_line.mesh = BoxMesh.new()
-	highlight_line.scale = Vector3(Floor.LINE_SIZE, 0.0001, Floor.TILE_SIZE + Floor.LINE_SIZE)
+	highlight_line = HIGHLIGHT_LINE_SCENE.instantiate()
+	#highlight_line.mesh = BoxMesh.new()
+	#highlight_line.scale = Vector3(Floor.LINE_SIZE, 0.0001, Floor.TILE_SIZE + Floor.LINE_SIZE)
 	get_tree().current_scene.add_child.call_deferred(highlight_line)
 	
-	var line_color = StandardMaterial3D.new()
-	highlight_line.set_surface_override_material(0, line_color)
+	#var line_color = StandardMaterial3D.new()
+	#highlight_line.set_surface_override_material(0, line_color)
 
 func place_boundary_walls():
 	#x facing
@@ -230,10 +231,12 @@ func handle_wall_highlight():
 			if monsters[i].pathfind_to_player() == null:
 				valid_placement = false
 		delete_wall_layout(wall_info)
-	if valid_placement:
-		highlight_line.get_surface_override_material(0).albedo_color = Color(0.7, 1, 0.7)
 	else:
-		highlight_line.get_surface_override_material(0).albedo_color = Color(1, 0.3, 0.3)
+		valid_placement = false
+	if valid_placement:
+		highlight_line.update_valid_placement()
+	else:
+		highlight_line.update_invalid_placement()
 
 func handle_wall_placement(position_and_type_info):
 	var new_wall = null
