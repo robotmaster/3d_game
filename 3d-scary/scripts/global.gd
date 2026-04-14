@@ -17,6 +17,8 @@ var playing_back_inputs = false
 var input_file = "user://game_logs/2026-04-14T16-10-02.txt"
 var inputs_to_play = {}
 
+var screen_shake = 0
+var screen_shake_decay = 0.1
 
 var settings = {
 	"scary": true
@@ -127,3 +129,6 @@ func log_inputs(mouse_movement):
 	log_file.seek(0)
 	log_file.store_string(JSON.stringify(input_logs))
 	log_file.flush()
+
+func _process(delta: float) -> void:
+	screen_shake *= pow(screen_shake_decay, delta)

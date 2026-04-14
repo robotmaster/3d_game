@@ -169,6 +169,8 @@ func handle_death(activate_scare):
 	var camera = $CameraPivot
 	var move_direction = Vector2.UP.rotated(camera.global_rotation.y) * 1.5
 	
+	Global.screen_shake = 0.3
+	
 	remove_child(camera)
 	get_tree().current_scene.add_child(camera)
 	
@@ -211,6 +213,7 @@ func handle_mouse_click():
 		delete_wall_layout(wall_info)
 		if valid:
 			handle_wall_placement(wall_info)
+			Global.screen_shake = 0.05
 			for i in range(MONSTER_COUNT):
 				monsters[i].current_path = monsters[i].pathfind_to_player()
 
@@ -313,7 +316,7 @@ func delete_wall_layout(position_and_type_info):
 
 
 func raycast_from_camera():
-	var camera = $CameraPivot/Camera3D
+	var camera = $CameraPivot
 
 	var from = camera.global_transform.origin
 	var to = from + camera.global_transform.basis.z * -CAMERA_SEE_LENGTH
