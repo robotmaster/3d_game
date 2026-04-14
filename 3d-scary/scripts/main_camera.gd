@@ -5,6 +5,7 @@ extends Camera3D
 
 func _process(delta: float) -> void:
 	var direction = Vector2.RIGHT.rotated(randf() * TAU)
-	var dir_3d = transform.basis * Vector3(direction.x, 0, direction.y).normalized()
+	var dir_3d = global_transform.basis * Vector3(direction.x, 0, direction.y).normalized()
+
 	
 	position = dir_3d * Global.screen_shake
