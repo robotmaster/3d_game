@@ -25,25 +25,29 @@ script = ExtResource("1_3vyb7")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6493316, 0)
 
 [node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+cull_mask = 1048573
+current = true
 
 [node name="PlayerModel" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6493316, 0)
-visible = false
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="PlayerModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6265583, 0)
+layers = 2
 mesh = SubResource("CapsuleMesh_3vyb7")
 skeleton = NodePath("../../PlayerCollision")
 surface_material_override/0 = SubResource("StandardMaterial3D_3vyb7")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="PlayerModel"]
 transform = Transform3D(0.21393485, 0, 0, 0, 0.28051832, 0, 0, 0, 0.53128946, 0.18, -0.20833158, -0.314)
+layers = 2
 mesh = SubResource("BoxMesh_3vyb7")
 skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("StandardMaterial3D_g2els")
 
 [node name="MeshInstance3D3" type="MeshInstance3D" parent="PlayerModel"]
 transform = Transform3D(0.21393485, 0, 0, 0, 0.28051832, 0, 0, 0, 0.53128946, -0.18, -0.20833158, -0.314)
+layers = 2
 mesh = SubResource("BoxMesh_3vyb7")
 skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("StandardMaterial3D_g2els")

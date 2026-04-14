@@ -2,7 +2,7 @@ extends CharacterBody3D
 class_name PlayerType
 
 @export var SPEED := 4.7
-@export var SPRINT_SPEED_MULT := 2.05
+@export var SPRINT_SPEED_MULT := 2
 @export var SIDEWAYS_SPRINT_NERF = 0.4
 @export var STAMINA_TIME = 2
 @export var STAMINA_REGEN_TIME = 4.5

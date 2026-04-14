@@ -1,7 +1,8 @@
-[gd_scene load_steps=14 format=3 uid="uid://rf7np0rsqv73"]
+[gd_scene load_steps=15 format=3 uid="uid://rf7np0rsqv73"]
 
 [ext_resource type="Script" uid="uid://b8jky8cdj2v2q" path="res://scripts/environment.gd" id="1_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://d2vu722mqafpl" path="res://scenes/player.tscn" id="2_0wfyh"]
+[ext_resource type="Script" uid="uid://dnrygxfbf357r" path="res://scripts/debug_cam.gd" id="2_o6xl0"]
 [ext_resource type="Script" uid="uid://78vxtj03c3vk" path="res://scripts/floor.gd" id="2_sugp2"]
 [ext_resource type="Script" uid="uid://0nk2kv1lue0c" path="res://scripts/ui.gd" id="4_jyhfs"]
 [ext_resource type="Texture2D" uid="uid://dmy8ib8gbexcq" path="res://monster_smile.png" id="5_tbgi4"]
@@ -48,6 +49,10 @@ environment = SubResource("Environment_0wfyh")
 transform = Transform3D(0.9936507, 0.03754537, 0.106060095, -0.11250954, 0.33158946, 0.93669087, 0, -0.9426763, 0.3337083, 0, 0, 0)
 light_energy = 0.25
 shadow_enabled = true
+
+[node name="DebugCam" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.329026, 0)
+script = ExtResource("2_o6xl0")
 
 [node name="Floor" type="StaticBody3D" parent="."]
 script = ExtResource("2_sugp2")

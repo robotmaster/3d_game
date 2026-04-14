@@ -43,23 +43,15 @@ func _physics_process(delta: float) -> void:
 	
 	var direction = (target - Vector2(global_position.x, global_position.z)).normalized()
 	
-	#linear_velocity.x += direction.x * max_speed * ACCELERATION_MULT
-	#linear_velocity.z += direction.y * max_speed * ACCELERATION_MULT
+	linear_velocity.x += direction.x * max_speed * ACCELERATION_MULT
+	linear_velocity.z += direction.y * max_speed * ACCELERATION_MULT
 	
 	if linear_velocity.length() > max_speed:
 		linear_velocity = linear_velocity.normalized() * max_speed
 	look_at(Vector3(target.x, 0, target.y))
 	global_rotation.x = 0
 	global_rotation.z = 0
-	#
-#func _process(delta: float) -> void:
-	#var path = pathfind_to_player()
-	#if Input.is_action_just_pressed("debug_command"):
-		#for i in path:
-			#var placeholder = load("res://scenes/placeholder.tscn").instantiate()
-			#placeholder.global_position = Vector3(cell_to_world(i.position_x), 0, cell_to_world(i.position_y))
-			#get_tree().current_scene.add_child(placeholder)
-#
+
 func _process(delta: float) -> void:
 	if Camera.is_position_in_frustum(global_position):
 		seen_time += delta

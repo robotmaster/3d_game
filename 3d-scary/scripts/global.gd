@@ -14,14 +14,13 @@ var unhandled_mouse_motion = Vector2()
 var log_file
 
 var playing_back_inputs = false
-var input_file = "user://game_logs/2026-04-12T21-12-03.txt"
+var input_file = "user://game_logs/2026-04-14T16-10-02.txt"
 var inputs_to_play = {}
 
 
 var settings = {
 	"scary": false
 }
-
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -36,25 +35,10 @@ func _input(event):
 		#Engine.max_physics_steps_per_frame = 0
 		#Engine.physics_ticks_per_second = 0
 func _unhandled_input(event):
-	if Global.game_paused:
+	if game_paused:
 		return
-	if not playing_back_inputs and event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		unhandled_mouse_motion += event.relative * mouse_sensitivity
-
-func handle_mouse_down():
-	if Input.is_action_just_pressed("click") and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
-		game_paused = false
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-		#Engine.time_scale = 1
-		#Engine.physics_ticks_per_second = 60
-		if not playing_back_inputs:
-			return
-	if not get_input("JUSTclick"):
-		return
-		
-	var player = get_node("/root/Main/Player")
-	if player.get_node("CameraPivot") != null:
-		player.handle_mouse_click.call_deferred()
 
 func new_game():
 	physics_frames_at_last_game = Engine.get_physics_frames()
@@ -69,8 +53,14 @@ func new_game():
 	
 	if playing_back_inputs:
 		inputs_to_play = JSON.parse_string(FileAccess.get_file_as_string(input_file))
+		var read_seed = inputs_to_play["seed"]
+		seed(read_seed)
 	else:
+		randomize()
+		var game_seed = randi()
+		seed(game_seed)
 		log_file = FileAccess.open("user://game_logs/" + time + ".txt", FileAccess.WRITE)
+		input_logs["seed"] = game_seed
 
 func passed_physics_frames():
 	return Engine.get_physics_frames() - physics_frames_at_last_game
@@ -81,24 +71,12 @@ func _physics_process(delta: float) -> void:
 	else:
 		handle_playback_input_toggle()
 	
-	handle_mouse_down()
-	var mouse_motion = unhandled_mouse_motion
-	var player = get_node("/root/Main/Player")
-	if player != null and not player.dead:
-		if playing_back_inputs:
-			var all_movement = inputs_to_play.mouse_movement
-			if len(all_movement) <= passed_physics_frames():
-				player.turn_player(mouse_motion)
-			else:
-				var turn_string : String = all_movement[passed_physics_frames()]
-				var x_and_y = turn_string.split(" ")
-				var x = float(x_and_y[0])
-				var y = float(x_and_y[1])
-				player.turn_player(Vector2(x, y))
-		else:
-			player.turn_player(mouse_motion)
-	unhandled_mouse_motion = Vector2()
-
+	if playing_back_inputs and Input.is_action_just_pressed("debug_command"):
+		var player = get_node("/root/Main/Player")
+		if get_node("/root/Main/DebugCam").current != true:
+			get_node("/root/Main/DebugCam").current = true
+		elif player != null and not player.dead:
+			get_node("/root/Main/Player/CameraPivot/Camera3D").current = true
 func handle_playback_input_toggle():
 	for input in logs_needed:
 		if input.begins_with("JUST"):
