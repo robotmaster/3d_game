@@ -213,7 +213,7 @@ func handle_mouse_click():
 		delete_wall_layout(wall_info)
 		if valid:
 			handle_wall_placement(wall_info)
-			Global.screen_shake = 0.05
+			#Global.screen_shake = 0.03
 			for i in range(MONSTER_COUNT):
 				monsters[i].current_path = monsters[i].pathfind_to_player()
 
