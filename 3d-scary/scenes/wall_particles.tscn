@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://srh5ip1ju81s"]
+
+[ext_resource type="Script" uid="uid://c6qis0jf2jta8" path="res://scripts/wall_particles.gd" id="1_ou0ky"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ou0ky"]
+albedo_color = Color(0.2, 0.16000001, 0.16000001, 1)
+billboard_mode = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_g2xnj"]
+material = SubResource("StandardMaterial3D_ou0ky")
+size = Vector2(0.08, 0.08)
+
+[node name="Particles" type="CPUParticles3D"]
+amount = 1000
+mesh = SubResource("QuadMesh_g2xnj")
+emission_shape = 3
+emission_box_extents = Vector3(1, 0, 1)
+direction = Vector3(0, 1, 0)
+spread = 12.58
+initial_velocity_min = 1.0
+initial_velocity_max = 3.0
+hue_variation_min = -1.0
+hue_variation_max = 1.0
+script = ExtResource("1_ou0ky")
