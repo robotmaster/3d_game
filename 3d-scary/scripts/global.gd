@@ -21,7 +21,7 @@ var screen_shake = 0
 var screen_shake_decay = 0.1
 
 var settings = {
-	"scary": true
+	"scary": false
 }
 
 func _ready() -> void:

@@ -6,7 +6,7 @@ extends Node3D
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if Global.settings.scary:
-		$Particles.mesh.material.albedo_color = Color(0.25, 0.4, 0.25, 0.2)
+		$Particles.mesh.material.albedo_color = Color(0.3, 0.35, 0.3, 0.2)
 	else:
 		$Particles.mesh.material.albedo_color = Color(0.85, 1 ,0.85, 0.2)
 	$LineMesh.scale = Vector3(Floor.LINE_SIZE / 2, 1, Floor.TILE_SIZE / 2 + Floor.LINE_SIZE / 2)

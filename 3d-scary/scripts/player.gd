@@ -1,12 +1,21 @@
 extends CharacterBody3D
 class_name PlayerType
 
-@export var SPEED := 4.7
-@export var SPRINT_SPEED_MULT := 2
-@export var SIDEWAYS_SPRINT_NERF = 0.4
+@export var SPEED := 4.4
+@export var SPEED_ACCELLERATION = 0.2
+@export var AIR_SPEED_ACCEL_MULT := 0.04
+
+
+@export var FRICTION_PER_FRAME := 0.8
+@export var AIR_FRICTION_PER_FRAME := 0.95
+@export var SPRINT_SPEED_MULT := 1.7
+@export var SIDEWAYS_SPRINT_NERF = 0.2
 @export var STAMINA_TIME = 2
 @export var STAMINA_REGEN_TIME = 4.5
-@export var JUMP_VELOCITY := 4.5
+
+@export var JUMP_VELOCITY := 4
+@export var JUMP_STAMINA = 0.2
+
 @export var CAMERA_SEE_LENGTH = 10
 
 @export var MONSTER_COUNT := 1
@@ -115,6 +124,24 @@ func _physics_process(delta: float) -> void:
 func _process(delta: float) -> void:
 	handle_wall_highlight()
 
+func get_max_sprint_speed_vector(dir: Vector2) -> Vector3:
+	
+	var normalized = dir.normalized()
+	
+	var direction = (transform.basis * Vector3(normalized.x, 0, normalized.y)).normalized()
+	var sprint_extra = transform.basis * Vector3(normalized.x * SIDEWAYS_SPRINT_NERF, 0, normalized.y) * (SPRINT_SPEED_MULT - 1)
+	if dir.y > 0:
+		sprint_extra = transform.basis * Vector3(normalized.x * SIDEWAYS_SPRINT_NERF, 0, normalized.y * SIDEWAYS_SPRINT_NERF) * (SPRINT_SPEED_MULT - 1)
+	return direction + sprint_extra
+
+func get_max_sprint_speed_in_dir(dir: Vector2):
+	
+	var vector_based_on_looking_direction = transform.basis.inverse() * Vector3(dir.x, 0, dir.y)
+	var movement_vector = get_max_sprint_speed_vector(Vector2(vector_based_on_looking_direction.x, vector_based_on_looking_direction.z))
+	return movement_vector
+	
+	#return get_max_sprint_speed_vector(Vector2(x_component, y_component))
+
 func handle_movement(delta):
 	#prevent moving into wall the moment it is pressed
 	#var saved_velocity = velocity
@@ -133,24 +160,53 @@ func handle_movement(delta):
 	var input_dir := Vector2(horizontal_input, forward_input).normalized()
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 
-	if direction and Global.get_input("sprint") and stamina > 0:
-		if input_dir.y < 0:
-			direction += transform.basis * Vector3(input_dir.x * SIDEWAYS_SPRINT_NERF, 0, input_dir.y) * (SPRINT_SPEED_MULT - 1)
-		else:
-			direction += transform.basis * Vector3(input_dir.x * SIDEWAYS_SPRINT_NERF, 0, input_dir.y * SIDEWAYS_SPRINT_NERF) * (SPRINT_SPEED_MULT - 1)
-	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
+	if direction and is_on_floor() and Global.get_input("sprint") and stamina > 0:
+		direction = get_max_sprint_speed_vector(input_dir)
+	#friction
+	if is_on_floor():
+		velocity.x *= FRICTION_PER_FRAME
+		velocity.z *= FRICTION_PER_FRAME
 	else:
-		velocity.x *= 0.8
-		velocity.z *= 0.8
+		velocity.x *= AIR_FRICTION_PER_FRAME
+		velocity.z *= AIR_FRICTION_PER_FRAME
+	if direction:
+		if is_on_floor():
+			var velocity_2d := Vector2(velocity.x, velocity.z)
+			var original_velocity_2d = velocity_2d
+			
+			velocity_2d.x += direction.x * SPEED
+			velocity_2d.y += direction.z * SPEED
+			
+			if Global.get_input("sprint"):
+				pass
+				if velocity_2d.length() > (get_max_sprint_speed_in_dir(velocity_2d) * SPEED).length():
+					if original_velocity_2d.length() > (get_max_sprint_speed_in_dir(original_velocity_2d) * SPEED).length():
+						velocity_2d = original_velocity_2d
+					else:
+						
+						var spint_speed = get_max_sprint_speed_in_dir(velocity_2d) * SPEED
+						velocity_2d = Vector2(spint_speed.x, spint_speed.z)
+			else:
+				if velocity_2d.length() > SPEED:
+					if original_velocity_2d.length() > SPEED:
+						velocity_2d = original_velocity_2d
+					else:
+						velocity_2d = velocity_2d.normalized() * SPEED
+			velocity.x = velocity_2d.x
+			velocity.z = velocity_2d.y
+			
+			
+			#if Vector2(velocity.x, velocity.z).length() > SPEED:
+		#Vector2(velocity.x, velocity.z).length() = SPEED
+		else:
+			velocity.x += direction.x * SPEED * AIR_SPEED_ACCEL_MULT
+			velocity.z += direction.z * SPEED * AIR_SPEED_ACCEL_MULT
 	
-	
-	if Global.get_input("sprint"):
+	if Global.get_input("sprint") and direction and is_on_floor():
 		stamina -= delta
 		if stamina < 0:
 			stamina = 0
-	else:
+	elif is_on_floor():
 		stamina += STAMINA_TIME / STAMINA_REGEN_TIME * delta
 		if stamina > STAMINA_TIME:
 			stamina = STAMINA_TIME
